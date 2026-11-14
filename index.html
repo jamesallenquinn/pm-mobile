@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PM">
+<meta name="theme-color" content="#ff8fc7">
+<meta name="robots" content="noindex">
+<title>Project Manager</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light dark;
+    --font: "Nunito", system-ui, sans-serif; --display: "Fredoka", "Nunito", sans-serif;
+    --fire-1: #ff8fc7; --fire-2: #c39bff; --fire-3: #7cc8ff;
+    --fire: linear-gradient(100deg, var(--fire-1), var(--fire-2) 52%, var(--fire-3));
+    --bg: light-dark(oklch(99.2% .007 350), oklch(19% .045 318));
+    --card: light-dark(#fff, oklch(24% .05 318));
+    --line: light-dark(oklch(91% .03 340), oklch(34% .05 320));
+    --ink: light-dark(oklch(38% .06 330), oklch(95% .025 340));
+    --ink-2: light-dark(oklch(52% .05 330), oklch(80% .04 340));
+    --good: light-dark(oklch(62% .14 155), oklch(74% .14 155));
+    --warn: light-dark(oklch(64% .17 40), oklch(78% .14 50));
+    --bad: light-dark(oklch(58% .19 25), oklch(72% .16 25));
+    --blue: light-dark(oklch(60% .15 255), oklch(76% .12 255));
+    --violet: light-dark(oklch(58% .12 300), oklch(78% .1 300));
+    --muted: light-dark(oklch(60% .03 300), oklch(72% .03 300));
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 var(--font); }
+  body { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .firebar { height: 4px; background: var(--fire); }
+  header { padding: calc(10px + env(safe-area-inset-top)) 16px 4px; display: flex; align-items: center; gap: 10px; }
+  h1 { font: 700 22px var(--display); margin: 0; background: var(--fire); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grow { flex: 1; }
+  .fresh { font-size: 12px; color: var(--ink-2); text-align: right; }
+  .fresh.stale { color: var(--warn); font-weight: 700; }
+  .iconbtn { border: 1.5px solid var(--line); background: var(--card); color: var(--ink); border-radius: 12px; min-width: 40px; height: 40px; font-size: 18px; }
+  main { padding: 6px 16px 20px; max-width: 720px; margin: 0 auto; }
+  h2 { font: 600 17px var(--display); margin: 20px 0 8px; display: flex; gap: 8px; align-items: center; }
+  .count { font: 800 12px var(--font); background: var(--fire); color: #fff; border-radius: 99px; padding: 1px 9px; }
+  .card { background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 12px 14px; margin: 0 0 9px; }
+  .hero { border: 0; background: color-mix(in oklch, var(--fire-2) 14%, var(--card)); }
+  .hero .lbl { font: 800 11px var(--font); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+  .hero .big { font: 700 17px/1.3 var(--display); margin: 3px 0; }
+  .muted { color: var(--ink-2); font-size: 13px; overflow-wrap: anywhere; }
+  .row { display: flex; gap: 9px; align-items: baseline; }
+  .chip { font: 800 10.5px var(--font); letter-spacing: .04em; text-transform: uppercase; border-radius: 99px; padding: 2px 9px; color: #fff; white-space: nowrap; }
+  .k-paid { background: var(--good); } .k-send { background: var(--blue); } .k-decide { background: var(--warn); }
+  .k-check { background: var(--violet); } .k-fyi { background: var(--muted); }
+  .p1 { background: var(--bad); } .p2 { background: var(--warn); } .p3 { background: var(--blue); } .p4, .p5 { background: var(--muted); }
+  .title { font-weight: 700; overflow-wrap: anywhere; }
+  .acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  button.a, a.a { font: 700 14px var(--font); border-radius: 12px; padding: 9px 14px; min-height: 42px; border: 1.5px solid var(--line);
+                  background: var(--bg); color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; }
+  button.primary { background: var(--fire); color: #fff; border: 0; text-shadow: 0 1px 2px #0003; }
+  button.ghost { color: var(--ink-2); }
+  .pending { opacity: .45; }
+  .tl { position: relative; padding-left: 16px; }
+  .tl::before { content: ""; position: absolute; left: 5px; top: 4px; bottom: 4px; width: 2px; background: var(--line); border-radius: 2px; }
+  .blk { position: relative; padding: 5px 0 7px; }
+  .blk::before { content: ""; position: absolute; left: -15px; top: 11px; width: 10px; height: 10px; border-radius: 99px; background: var(--line); }
+  .blk.now::before { background: var(--fire-1); box-shadow: 0 0 0 4px color-mix(in oklch, var(--fire-1) 30%, transparent); }
+  .blk.past { color: var(--ink-2); text-decoration: line-through; }
+  .blk.personal .t { color: var(--blue); }
+  .blk .tm { font: 800 12px var(--font); color: var(--ink-2); }
+  .filters { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .filters button { flex: none; border: 1.5px solid var(--line); background: var(--card); color: var(--ink-2); border-radius: 99px; padding: 6px 12px; font: 700 13px var(--font); }
+  .filters button.on { background: var(--fire); color: #fff; border: 0; }
+  .money-top { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .money-top .card { margin: 0; }
+  .num { font: 700 22px var(--display); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  td { padding: 5px 0; border-top: 1px solid var(--line); vertical-align: top; }
+  td.r { text-align: right; white-space: nowrap; padding-left: 8px; }
+  .late { color: var(--bad); font-weight: 800; }
+  details summary { cursor: pointer; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(4, 1fr);
+             background: color-mix(in oklch, var(--card) 92%, transparent); backdrop-filter: blur(10px);
+             border-top: 1.5px solid var(--line); padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); }
+  nav.tabs button { border: 0; background: none; color: var(--ink-2); font: 800 11.5px var(--font); display: grid; justify-items: center; gap: 2px; padding: 6px 0; border-radius: 12px; }
+  nav.tabs button .e { font-size: 21px; line-height: 1; }
+  nav.tabs button.on { color: var(--ink); background: color-mix(in oklch, var(--fire-1) 16%, transparent); }
+  nav.tabs .badge { font-size: 10px; background: var(--fire); color: #fff; border-radius: 99px; padding: 0 6px; margin-left: 2px; }
+  .lock { text-align: center; padding: 60px 24px; }
+  .lock .big { font: 700 22px var(--display); margin: 10px 0; }
+  .toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--ink); color: var(--bg);
+           border-radius: 12px; padding: 10px 16px; font-weight: 700; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 9; max-width: 90vw; }
+  .toast.on { opacity: 1; }
+  .outbox { font-size: 12.5px; color: var(--warn); font-weight: 700; padding: 0 16px; }
+  ul.plain { margin: 4px 0 0; padding-left: 18px; }
+  ul.plain li { margin: 3px 0; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<div class="firebar"></div>
+<header>
+  <h1>Project Manager</h1>
+  <div class="grow"></div>
+  <div class="fresh" id="fresh"></div>
+  <button class="iconbtn" id="reload" aria-label="Refresh">↻</button>
+</header>
+<div class="outbox" id="outbox"></div>
+<main id="view"></main>
+<nav class="tabs" id="tabs">
+  <button data-tab="today"><span class="e">☀️</span>Today</button>
+  <button data-tab="queue"><span class="e">✅</span><span>Queue<span class="badge" id="qn" hidden></span></span></button>
+  <button data-tab="board"><span class="e">📋</span>Board</button>
+  <button data-tab="money"><span class="e">💵</span>Money</button>
+</nav>
+<div class="toast" id="toast"></div>
+<script>
+// Supabase table that parks taps while the PC is off (publishable key: public by design; rows are encrypted)
+const SUPA_URL = "https://bwfnocjofegbpdusiluh.supabase.co";
+const SUPA_KEY = "sb_publishable_JvfZ66eYe_7TRyekoiQSBg_zh0V9pug";
+const SUPA_TABLE = "pm_actions";
+const LS = {key: "pm_key", box: "pm_box", outbox: "pm_outbox", tab: "pm_tab", filter: "pm_filter"};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const money = x => "$" + Number(x || 0).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2});
+const ls = {get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+            set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }};
+let SNAP = null, CKEY = null, TAB = ls.get(LS.tab, "today");
+
+function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("on"), 2600); }
+const b64u = {enc: b => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""),
+              dec: s => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4)), c => c.charCodeAt(0))};
+
+async function key() {
+  if (CKEY) return CKEY;
+  const m = location.hash.match(/k=([A-Za-z0-9_-]{40,})/);
+  if (m) { ls.set(LS.key, m[1]); history.replaceState(null, "", location.pathname); }
+  const raw = ls.get(LS.key, null);
+  if (!raw) return null;
+  CKEY = await crypto.subtle.importKey("raw", b64u.dec(raw), "AES-GCM", false, ["encrypt", "decrypt"]);
+  return CKEY;
+}
+async function open(box) {
+  const pt = await crypto.subtle.decrypt({name: "AES-GCM", iv: b64u.dec(box.iv)}, await key(), b64u.dec(box.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function seal(obj) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await key(), new TextEncoder().encode(JSON.stringify(obj)));
+  return {v: 1, iv: b64u.enc(iv), ct: b64u.enc(ct)};
+}
+
+async function load(net = true) {
+  if (!(await key())) return lock();
+  let box = null;
+  if (net) {
+    try { const r = await fetch("data.enc?t=" + Date.now(), {cache: "no-store"}); if (r.ok) { box = await r.json(); ls.set(LS.box, box); } } catch {}
+  }
+  box = box || ls.get(LS.box, null);
+  if (!box) { $("#view").innerHTML = '<div class="lock"><div class="big">No data yet</div><div class="muted">Check your connection and tap ↻.</div></div>'; return; }
+  try { SNAP = await open(box); } catch { return lock("This phone's key doesn't match the data. Open your setup link again."); }
+  const applied = new Set(SNAP.applied || []);
+  ls.set(LS.outbox, ls.get(LS.outbox, []).filter(a => !applied.has(a.aid)));
+  render();
+  flush();
+}
+
+function lock(msg) {
+  $("#view").innerHTML = `<div class="lock"><div style="font-size:46px">🔒</div><div class="big">Open your setup link</div>
+    <div class="muted">${esc(msg || "This page shows your business data only after the one-time setup link (in your Gmail drafts) has been opened on this phone.")}</div></div>`;
+  $("#fresh").textContent = "";
+}
+
+function ago(iso) {
+  const m = Math.round((Date.now() - new Date(iso)) / 60000);
+  return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.round(m / 60) + " h ago" : Math.round(m / 1440) + " d ago";
+}
+
+// ------------------------------------------------------------ outbox (taps made here, applied by the PC on its next sync)
+function pendingIds() { return new Set(ls.get(LS.outbox, []).map(a => a.target)); }
+async function act(a) {
+  a.aid = crypto.randomUUID(); a.at = new Date().toISOString();
+  const box = ls.get(LS.outbox, []); box.push(a); ls.set(LS.outbox, box);
+  render(); toast("Saved. Your PC applies it on its next check."); flush();
+}
+async function flush() {
+  const box = ls.get(LS.outbox, []);
+  let changed = false;
+  for (const a of box) {
+    if (a.sent) continue;
+    try {
+      const r = await fetch(`${SUPA_URL}/rest/v1/${SUPA_TABLE}`, {method: "POST",
+        headers: {"apikey": SUPA_KEY, "Content-Type": "application/json", "Prefer": "return=minimal"},
+        body: JSON.stringify({payload: JSON.stringify(await seal(a))})});
+      if (r.ok) { a.sent = true; changed = true; }
+    } catch {}
+  }
+  if (changed) ls.set(LS.outbox, box);
+  const waiting = box.filter(a => !a.sent).length, sent = box.filter(a => a.sent).length;
+  $("#outbox").textContent = waiting ? `${waiting} tap(s) waiting to send` : sent ? `${sent} tap(s) waiting for your PC to apply` : "";
+}
+
+// ------------------------------------------------------------ views
+const KIND = {"paid?": ["paid", "Looks paid"], send: ["send", "Send"], decide: ["decide", "Decide"], check: ["check", "Check"], fyi: ["fyi", "FYI"]};
+
+function render() {
+  if (!SNAP) return;
+  const age = (Date.now() - new Date(SNAP.generated_at)) / 3600000;
+  $("#fresh").innerHTML = `Updated ${ago(SNAP.generated_at)}` + (age > 3 ? "<br>PC may be off" : "");
+  $("#fresh").className = "fresh" + (age > 3 ? " stale" : "");
+  const pend = pendingIds();
+  const q = (SNAP.queue || []).filter(x => !pend.has(x.id));
+  const qn = $("#qn"); qn.hidden = !q.length; qn.textContent = q.length;
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === TAB));
+  $("#view").innerHTML = ({today, queue, board, money: moneyView})[TAB](pend);
+  window.scrollTo(0, 0);
+}
+
+function today(pend) {
+  const b = SNAP.briefing || {}, p = SNAP.plan || {};
+  const now = new Date(), hm = now.getHours() * 60 + now.getMinutes();
+  const mins = s => { const m = String(s || "").match(/(\d{1,2}):(\d\d)/); if (!m) return null; let h = +m[1]; if (h < 8 && h >= 1) h += 12; return h * 60 + +m[2]; };
+  const sameDay = p.date === now.toISOString().slice(0, 10);
+  const blocks = (p.blocks || []).map(x => {
+    const s = mins(x.start), e = mins(x.end);
+    const cls = !sameDay ? "" : e !== null && e <= hm ? "past" : s !== null && s <= hm && hm < e ? "now" : "";
+    return `<div class="blk ${cls} ${x.kind === "personal" || x.kind === "break" ? "personal" : ""}"><div class="tm">${esc(x.start)} to ${esc(x.end)}</div><div class="t">${esc(x.title)}</div></div>`;
+  }).join("");
+  const df = b.do_first;
+  return `
+    ${b.headline ? `<div class="card hero"><div class="lbl">Today</div><div class="big">${esc(b.headline)}</div></div>` : ""}
+    ${df ? `<div class="card"><div class="lbl muted" style="font-weight:800">DO FIRST</div><div class="title">${esc(df.title)}</div><div class="muted">${esc(df.why)}</div>${boardActs(df.id, pend)}</div>` : ""}
+    ${(p.hot_items || []).length ? `<h2>Hot items</h2><div class="card"><ul class="plain">${p.hot_items.map(h => `<li>${esc(h)}</li>`).join("")}</ul></div>` : ""}
+    <h2>Schedule ${sameDay ? "" : `<span class="muted">(${esc(p.date || "")})</span>`}</h2>
+    <div class="card"><div class="tl">${blocks || '<div class="muted">No schedule yet.</div>'}</div></div>
+    ${(b.needs_decision || []).length ? `<h2>Needs your call</h2><div class="card"><ul class="plain">${b.needs_decision.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+    ${(b.priorities || []).length ? `<h2>Top priorities</h2>${b.priorities.map(x => `<div class="card ${pend.has(x.id) ? "pending" : ""}"><div class="title">${esc(x.title)}</div><div class="muted">${esc(x.reason)}</div>${boardActs(x.id, pend)}</div>`).join("")}` : ""}
+    ${(b.new_mail || []).length ? `<h2>New mail</h2><div class="card">${b.new_mail.map(m => `<div><b>${esc(m.business)}</b> <span class="muted">${esc(m.count)}</span><ul class="plain">${(m.highlights || []).map(h => `<li>${esc(h)}</li>`).join("")}</ul></div>`).join("")}</div>` : ""}
+    ${(b.actions_taken || []).length ? `<h2>Done for you</h2><div class="card"><ul class="plain muted">${b.actions_taken.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}`;
+}
+
+function queue(pend) {
+  const items = (SNAP.queue || []);
+  if (!items.length) return '<h2>Needs you</h2><div class="card muted">Nothing needs you right now.</div>';
+  return `<h2>Needs you <span class="count">${items.filter(x => !pend.has(x.id)).length}</span></h2>` + items.map(it => {
+    const [cls, label] = KIND[it.kind] || ["fyi", it.kind];
+    const isPath = /^[A-Z]:\\/.test(it.detail || "");
+    const acts = (it.actions || []).map((a, i) => `<button class="a ${a.op.endsWith("dismiss") ? "ghost" : i === 0 ? "primary" : ""}" data-q="${esc(it.id)}" data-i="${i}">${esc(a.label)}</button>`).join("");
+    return `<div class="card ${pend.has(it.id) ? "pending" : ""}">
+      <div class="row"><span class="chip k-${cls}">${esc(label)}</span><span class="title">${esc(it.title)}</span></div>
+      ${it.detail && !isPath ? `<div class="muted" style="margin-top:4px">${esc(it.detail)}</div>` : ""}
+      ${isPath ? `<div class="muted" style="margin-top:4px">File on your PC: ${esc(it.detail.split("\\").pop())}</div>` : ""}
+      <div class="acts">${it.link ? `<a class="a" href="${esc(it.link)}" target="_blank" rel="noopener">Open drafts</a>` : ""}${pend.has(it.id) ? '<span class="muted">Saved, waiting for your PC</span>' : acts}</div></div>`;
+  }).join("");
+}
+
+function boardActs(id, pend) {
+  if (!id) return "";
+  if (pend.has(id)) return '<div class="acts"><span class="muted">Saved, waiting for your PC</span></div>';
+  return `<div class="acts"><button class="a primary" data-ob="${esc(id)}" data-op="done">Done</button><button class="a" data-ob="${esc(id)}" data-op="snooze">Tomorrow</button></div>`;
+}
+
+function board(pend) {
+  const all = SNAP.board || [];
+  const f = ls.get(LS.filter, "All");
+  const clients = ["All", ...Array.from(new Set(all.map(o => o.client).filter(Boolean))).sort()];
+  const list = all.filter(o => f === "All" || o.client === f);
+  const todayIso = new Date().toISOString().slice(0, 10);
+  return `<h2>Board <span class="count">${list.length}</span></h2>
+    <div class="filters">${clients.map(c => `<button class="${c === f ? "on" : ""}" data-filter="${esc(c)}">${esc(c)}</button>`).join("")}</div>
+    ${list.map(o => `<details class="card ${pend.has(o.id) ? "pending" : ""}"><summary>
+      <div class="row"><span class="chip p${o.priority || 4}">P${o.priority || "-"}</span><span class="title">${esc(o.title)}</span></div>
+      <div class="muted" style="margin-top:3px">${esc(o.client)}${o.due ? ` · due <span class="${o.due < todayIso ? "late" : ""}">${esc(o.due)}</span>` : ""}${o.status === "waiting-on" ? " · waiting on others" : ""}</div></summary>
+      ${o.notes ? `<div class="muted" style="margin-top:6px">${esc(o.notes)}</div>` : ""}${boardActs(o.id, pend)}</details>`).join("")}`;
+}
+
+function moneyView() {
+  const m = SNAP.money || {};
+  const age = d => d > 60 ? "late" : d > 0 ? "late" : "";
+  return `<h2>Money</h2>
+    <div class="money-top"><div class="card"><div class="muted">Owed to you</div><div class="num">${money(m.total)}</div></div>
+    <div class="card"><div class="muted">Past due</div><div class="num ${m.past_due ? "late" : ""}">${money(m.past_due)}</div></div></div>
+    ${(m.clients || []).map(c => `<details class="card"><summary><div class="row"><span class="title" style="flex:1">${esc(c.client)}</span><b>${money(c.total)}</b></div>
+      ${c.past_due ? `<div class="muted"><span class="late">${money(c.past_due)} past due</span></div>` : ""}</summary>
+      <table>${c.invoices.map(i => `<tr><td>${esc(i.number)}<div class="muted">${esc(i.project)}</div></td><td class="r">${money(i.amount)}<div class="muted ${age(i.days_past)}">${i.days_past > 0 ? i.days_past + " d late" : "due " + esc(i.due)}</div></td></tr>`).join("")}</table></details>`).join("")}
+    ${(m.pipeline || []).length ? `<h2>Work in hand</h2><div class="card"><table>${m.pipeline.map(p => `<tr><td>${esc(p.project)}<div class="muted">${esc(p.client || "")} · ${esc(p.note || "")}</div></td><td class="r">${money(p.amount)}</td></tr>`).join("")}</table></div>` : ""}
+    ${(m.pending || []).length ? `<h2>Not billed yet</h2><div class="card"><table>${m.pending.map(p => `<tr><td>${esc(p.project)}<div class="muted">${esc(p.client)} · ${esc(p.status)}</div></td><td class="r">${money(p.amount)}</td></tr>`).join("")}</table></div>` : ""}`;
+}
+
+// ------------------------------------------------------------ events
+document.addEventListener("click", e => {
+  const t = e.target.closest("button");
+  if (!t) return;
+  if (t.dataset.tab) { TAB = t.dataset.tab; ls.set(LS.tab, TAB); return render(); }
+  if (t.id === "reload") { toast("Refreshing"); return load(true); }
+  if (t.dataset.filter) { ls.set(LS.filter, t.dataset.filter); return render(); }
+  if (t.dataset.ob) {
+    e.preventDefault();
+    return act({kind: "board", ob: t.dataset.ob, op: t.dataset.op, days: 1, target: t.dataset.ob, label: t.textContent});
+  }
+  if (t.dataset.q) {
+    const it = (SNAP.queue || []).find(x => x.id === t.dataset.q); if (!it) return;
+    const a = it.actions[+t.dataset.i]; const args = Object.assign({}, a.args || {});
+    if (a.input === "amount") { const v = prompt(a.label + ":"); if (!v) return; args.amount = v; }
+    return act({kind: "queue", op: a.op, args, item_id: it.id, target: it.id, label: `${a.label}: ${it.title}`});
+  }
+});
+document.addEventListener("visibilitychange", () => { if (!document.hidden) load(true); });
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+load(true);
+</script>
+</body>
+</html>
